@@ -9,3 +9,5 @@ case class HttpConfig(
   port: Int,
   timeout: FiniteDuration
 )
+
+case class OneForgeConfig(apiKey: String)
