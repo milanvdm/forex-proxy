@@ -1,10 +1,10 @@
 package forex.programs.rates
 
-import forex.services.rates.errors.{Error => RatesServiceError}
+import forex.services.rates.{ Error ⇒ RatesServiceError }
 
 object errors {
 
-  sealed trait Error extends Exception
+  sealed trait Error extends Throwable
   object Error {
     final case class RateLookupFailed(msg: String) extends Error
   }
