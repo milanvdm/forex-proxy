@@ -1,4 +1,4 @@
-package forex.services.rates.interpreters
+package forex.services.rates.interpreters.dummy
 
 import cats.Applicative
 import forex.domain.{ Pair, Price, Rate, Timestamp }
@@ -10,4 +10,6 @@ class OneForgeDummy[F[_]](implicit A: Applicative[F]) extends Algebra[F] {
     A.pure(
       Rate(pair, Price(BigDecimal(100)), Timestamp.now)
     )
+
+  override def getAllPairs = ???
 }

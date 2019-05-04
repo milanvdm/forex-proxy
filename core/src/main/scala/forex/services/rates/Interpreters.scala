@@ -1,8 +1,10 @@
 package forex.services.rates
 
 import cats.Applicative
+import cats.effect.Sync
 import forex.config.OneForgeConfig
-import forex.services.rates.interpreters._
+import forex.services.rates.interpreters.dummy.OneForgeDummy
+import forex.services.rates.interpreters.live.OneForgeLive
 import org.http4s.client.Client
 
 object Interpreters {
@@ -14,7 +16,7 @@ object Interpreters {
     httpClient: Client[F]
   )(
     implicit
-    A: Applicative[F]
+    S: Sync[F]
   ): Algebra[F] =
     new OneForgeLive[F](config, httpClient)
 

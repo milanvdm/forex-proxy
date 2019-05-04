@@ -8,8 +8,16 @@ final case class Pair(
 )
 
 object Pair {
+
+  def all: Set[Pair] = {
+    val currencies = Currency.values
+    val pairs = for { from ← currencies; to ← currencies if from != to } yield Pair(from, to)
+    pairs.toSet
+  }
+
   implicit val encoder: Encoder[Pair] = new Encoder[Pair] {
     def apply(pair: Pair): Json =
       Json.fromString(s"${pair.from.entryName}${pair.to.entryName}")
   }
+
 }
