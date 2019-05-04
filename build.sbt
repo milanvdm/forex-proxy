@@ -52,19 +52,6 @@ lazy val commonScalacOptions = Seq(
   "-Ywarn-inaccessible"
 )
 
-lazy val dockerSettings = Seq(
-  name := "forex-proxy",
-  dockerBaseImage := "openjdk:jre-alpine",
-  packageName in Docker := name.value,
-  version in Docker := version.value
-)
-
-lazy val noPublishSettings = Seq(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false
-)
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Dependencies
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,9 +96,7 @@ lazy val D = new {
   val pureConfig = "com.github.pureconfig" %% "pureconfig"           % Versions.pureConfig
 
   // Test
-  val scalaTest = "org.scalatest"          %% "scalatest"       % Versions.scalaTest
-  val scalaCheck = "org.scalacheck"        %% "scalacheck"      % Versions.scalaCheck
-  val catsScalaCheck = "io.chrisdavenport" %% "cats-scalacheck" % Versions.catsScalaCheck
+  val scalaTest = "org.scalatest" %% "scalatest" % Versions.scalaTest
 
   // Compiler
   val kindProjector = "org.spire-math"  %% "kind-projector" % Versions.kindProjector
@@ -127,7 +112,6 @@ lazy val `forex-proxy` = Project(
   base = file(".")
 ).settings(moduleName := "forex-proxy")
   .settings(commonSettings)
-  .settings(noPublishSettings)
   .aggregate(core)
   .dependsOn(core)
 
@@ -136,7 +120,6 @@ lazy val core = Project(
   base = file("core")
 ).settings(moduleName := "core")
   .settings(commonSettings)
-  .settings(dockerSettings)
   .settings(Revolver.settings)
   .settings(
     libraryDependencies ++= Seq(
@@ -156,15 +139,8 @@ lazy val core = Project(
       D.http4sClient,
       D.http4sDsl,
       D.pureConfig,
-      D.scalaTest % "it,test"
+      D.scalaTest % "test"
     )
-  )
-  .configs(IntegrationTest extend Test)
-  .settings(Defaults.itSettings)
-  .settings(
-    fork in IntegrationTest := true,
-    parallelExecution in IntegrationTest := false,
-    inConfig(IntegrationTest)(ScalafmtPlugin.scalafmtConfigSettings)
   )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
