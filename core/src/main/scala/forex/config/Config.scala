@@ -6,7 +6,16 @@ import pureconfig.generic.auto._
 
 object Config {
 
-  def stream[F[_]: Sync](path: String): Stream[F, ApplicationConfig] =
-    Stream.eval(Sync[F].delay(pureconfig.loadConfigOrThrow[ApplicationConfig](path)))
+  def stream[F[_]](
+    path: String
+  )(
+    implicit
+    S: Sync[F]
+  ): Stream[F, ApplicationConfig] =
+    Stream.eval(
+      S.delay(
+        pureconfig.loadConfigOrThrow[ApplicationConfig](path)
+      )
+    )
 
 }

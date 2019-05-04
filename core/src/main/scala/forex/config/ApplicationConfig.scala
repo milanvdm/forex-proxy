@@ -2,7 +2,10 @@ package forex.config
 
 import scala.concurrent.duration.FiniteDuration
 
-case class ApplicationConfig(http: HttpConfig)
+case class ApplicationConfig(
+  http: HttpConfig,
+  oneForge: OneForgeConfig
+)
 
 case class HttpConfig(
   host: String,
