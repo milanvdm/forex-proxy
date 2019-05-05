@@ -44,16 +44,19 @@ class OneForgeLive[F[_]](
               case _: DecodeFailure =>
                 response
                   .as[OneForgeErrorResponse]
-                  .reject { case errorResponse => Error.OneForgeLookupFailed(errorResponse.message) }
+                  .reject {
+                    case errorResponse =>
+                      Error.OneForgeLookupFailed(errorResponse.message, response.status.code)
+                  }
                   .map(_ => Set.empty[OneForgeSuccessResponse])
                   .adaptError {
                     case _: DecodeFailure => Error.Internal("Failed to decode api response")
                   }
             }
-        case r =>
-          r.as[String]
-            .reject { case errorResponse => Error.OneForgeLookupFailed(errorResponse) }
-            .map(_ => Set.empty)
+        case response =>
+          S.raiseError(
+            Error.OneForgeLookupFailed(response.status.reason, response.status.code)
+          )
       }
     } yield pairs.map(toRate)
 

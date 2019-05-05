@@ -2,8 +2,9 @@ package forex.services.rates.interpreters.live
 
 import cats.effect.IO
 import forex.config.OneForgeConfig
-import forex.domain.{ Currency, Pair, Price, Rate, Timestamp }
+import forex.domain._
 import forex.services.RatesServices
+import forex.services.rates.Error
 import io.circe.Json
 import io.circe.literal._
 import org.http4s.circe._
@@ -15,8 +16,6 @@ import org.scalatest.{ FlatSpec, Matchers }
 
 class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
   import OneForgeLiveSpec._
-
-  val config = OneForgeConfig("http://myservice", "secret")
 
   private def mockHttpClient(response: IO[Response[IO]]): Client[IO] = {
     object PairsQueryParam extends QueryParamDecoderMatcher[String]("pairs")
@@ -57,9 +56,50 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
 
   }
 
+  "getAllRates" should "return Error if Forge API responds with error message" in {
+
+    val httpClient = mockHttpClient(Ok(errorResponse))
+    val ratesService = RatesServices.live[IO](config, httpClient)
+
+    val exception = intercept[Error.OneForgeLookupFailed] {
+      ratesService.getAllRates.unsafeRunSync()
+    }
+
+    exception.message shouldBe "It broke"
+
+  }
+
+  "getAllRates" should "return Error if Forge API responds with random message" in {
+
+    val httpClient = mockHttpClient(Ok("random"))
+    val ratesService = RatesServices.live[IO](config, httpClient)
+
+    val exception = intercept[Error.Internal] {
+      ratesService.getAllRates.unsafeRunSync()
+    }
+
+    exception.reason shouldBe "Failed to decode api response"
+
+  }
+
+  "getAllRates" should "return Error if Forge API responds with 404" in {
+
+    val httpClient = mockHttpClient(NotFound())
+    val ratesService = RatesServices.live[IO](config, httpClient)
+
+    val exception = intercept[Error.OneForgeLookupFailed] {
+      ratesService.getAllRates.unsafeRunSync()
+    }
+
+    exception.status shouldBe 404
+
+  }
+
 }
 
 object OneForgeLiveSpec {
+
+  val config = OneForgeConfig("http://myservice", "secret")
 
   val successResponse: Json =
     json"""
@@ -79,6 +119,14 @@ object OneForgeLiveSpec {
               "timestamp": 1556958556
             }
           ]
+        """
+
+  val errorResponse: Json =
+    json"""
+          {
+            "error": true,
+            "message": "It broke"
+          }
         """
 
 }

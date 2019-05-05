@@ -44,7 +44,7 @@ class RatesHttpRoutes[F[_]](
         rates
           .flatMap(Ok(_))
           .recoverWith {
-            case error: Error.ParseFailure     => BadRequest(error.msg)
+            case error: Error.ParseFailure => BadRequest(error.msg)
             case error: Error.RateLookupFailed => InternalServerError(error.msg)
           }
     }
