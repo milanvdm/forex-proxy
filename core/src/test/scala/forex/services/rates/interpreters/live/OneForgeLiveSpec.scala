@@ -25,7 +25,7 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
     Client.fromHttpApp[IO] {
       HttpRoutes
         .of[IO] {
-          case GET → Root / "quotes" :? PairsQueryParam(_) +& ApiKeyQueryParam(_) ⇒
+          case GET -> Root / "quotes" :? PairsQueryParam(_) +& ApiKeyQueryParam(_) =>
             response
         }
         .orNotFound

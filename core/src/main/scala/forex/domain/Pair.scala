@@ -11,7 +11,7 @@ object Pair {
 
   def all: Set[Pair] = {
     val currencies = Currency.values
-    val pairs = for { from ← currencies; to ← currencies if from != to } yield Pair(from, to)
+    val pairs = for { from <- currencies; to <- currencies if from != to } yield Pair(from, to)
     pairs.toSet
   }
 

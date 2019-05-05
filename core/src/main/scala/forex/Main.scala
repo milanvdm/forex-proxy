@@ -27,12 +27,12 @@ class Application[F[_]](
 
   def stream: Stream[F, Unit] =
     for {
-      config ← Config.stream("app")
-      httpClient ← BlazeClientBuilder
+      config <- Config.stream("app")
+      httpClient <- BlazeClientBuilder
         .apply(EC)
         .stream
       module = new Module[F](config, httpClient)
-      _ ← BlazeServerBuilder[F]
+      _ <- BlazeServerBuilder[F]
         .bindHttp(config.http.port, config.http.host)
         .withHttpApp(module.httpApp)
         .serve

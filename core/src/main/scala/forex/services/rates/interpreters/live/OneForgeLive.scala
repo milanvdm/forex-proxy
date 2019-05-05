@@ -30,30 +30,30 @@ class OneForgeLive[F[_]](
 
   override def getAllRates: F[Set[Rate]] =
     for {
-      rootUri ← S.fromEither[Uri](Uri.fromString(apiRoot))
+      rootUri <- S.fromEither[Uri](Uri.fromString(apiRoot))
       uri = rootUri
         .withPath(quotesPath)
         .withQueryParam("pairs", Pair.all)
         .withQueryParam("api_key", config.apiKey)
 
-      pairs ← httpClient.get[Set[OneForgeSuccessResponse]](uri) {
-        case Successful(response) ⇒
+      pairs <- httpClient.get[Set[OneForgeSuccessResponse]](uri) {
+        case Successful(response) =>
           response
             .as[Set[OneForgeSuccessResponse]]
             .recoverWith {
-              case _: DecodeFailure ⇒
+              case _: DecodeFailure =>
                 response
                   .as[OneForgeErrorResponse]
-                  .reject { case errorResponse ⇒ Error.OneForgeLookupFailed(errorResponse.message) }
-                  .map(_ ⇒ Set.empty[OneForgeSuccessResponse])
+                  .reject { case errorResponse => Error.OneForgeLookupFailed(errorResponse.message) }
+                  .map(_ => Set.empty[OneForgeSuccessResponse])
                   .adaptError {
-                    case _: DecodeFailure ⇒ Error.Internal("Failed to decode api response")
+                    case _: DecodeFailure => Error.Internal("Failed to decode api response")
                   }
             }
-        case r ⇒
+        case r =>
           r.as[String]
-            .reject { case errorResponse ⇒ Error.OneForgeLookupFailed(errorResponse) }
-            .map(_ ⇒ Set.empty)
+            .reject { case errorResponse => Error.OneForgeLookupFailed(errorResponse) }
+            .map(_ => Set.empty)
       }
     } yield pairs.map(toRate)
 

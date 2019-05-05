@@ -5,7 +5,7 @@ import cats.syntax.monadError._
 import forex.domain._
 import forex.programs.rates.errors._
 import forex.services.RatesService
-import forex.services.rates.{ Error ⇒ RatesServiceError }
+import forex.services.rates.{ Error => RatesServiceError }
 
 class Program[F[_]](
   ratesService: RatesService[F]
@@ -18,7 +18,7 @@ class Program[F[_]](
     ratesService
       .get(Pair(request.from, request.to))
       .adaptError {
-        case error: RatesServiceError ⇒ toProgramError(error)
+        case error: RatesServiceError => toProgramError(error)
       }
 
 }
