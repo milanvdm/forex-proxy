@@ -10,9 +10,9 @@ object Timestamp {
 
   def fromEpoch(epoch: Long): Timestamp =
     Timestamp(
-      OffsetDateTime.ofInstant(
-        Instant.ofEpochMilli(epoch),
-        ZoneId.systemDefault()
-      )
+      Instant
+        .ofEpochSecond(epoch)
+        .atZone(ZoneId.systemDefault)
+        .toOffsetDateTime
     )
 }
