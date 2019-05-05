@@ -63,6 +63,7 @@ lazy val D = new {
     val catsEffect = "1.3.0"
     val catsPar = "0.2.1"
     val enumeratum = "1.5.13"
+    val enumeratumCirce = "1.5.21"
     val fs2 = "1.0.4"
     val http4s = "0.20.0"
     val circe = "0.11.1"
@@ -85,9 +86,10 @@ lazy val D = new {
   val circeGeneric = "io.circe"            %% "circe-generic"        % Versions.circe
   val circeGenericExtras = "io.circe"      %% "circe-generic-extras" % Versions.circe
   val circeJava8 = "io.circe"              %% "circe-java8"          % Versions.circe
+  val circeLiteral = "io.circe"            %% "circe-literal"        % Versions.circe
   val circeParser = "io.circe"             %% "circe-parser"         % Versions.circe
   val enumeratum = "com.beachape"          %% "enumeratum"           % Versions.enumeratum
-  val enumeratumCirce = "com.beachape"     %% "enumeratum-circe"     % Versions.enumeratum
+  val enumeratumCirce = "com.beachape"     %% "enumeratum-circe"     % Versions.enumeratumCirce
   val fs2 = "co.fs2"                       %% "fs2-core"             % Versions.fs2
   val http4sServer = "org.http4s"          %% "http4s-blaze-server"  % Versions.http4s
   val http4sCirce = "org.http4s"           %% "http4s-circe"         % Versions.http4s
@@ -130,6 +132,7 @@ lazy val core = Project(
       D.circeGeneric,
       D.circeGenericExtras,
       D.circeJava8,
+      D.circeLiteral,
       D.circeParser,
       D.enumeratum,
       D.enumeratumCirce,

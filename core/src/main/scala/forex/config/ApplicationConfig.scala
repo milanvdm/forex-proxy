@@ -13,4 +13,7 @@ case class HttpConfig(
   timeout: FiniteDuration
 )
 
-case class OneForgeConfig(apiKey: String)
+case class OneForgeConfig(
+  apiRoot: String,
+  apiKey: String
+)

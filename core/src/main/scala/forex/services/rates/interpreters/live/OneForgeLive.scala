@@ -23,12 +23,12 @@ class OneForgeLive[F[_]](
   import Protocol._
   import QueryParams._
 
-  private val apiRoot = "https://forex.1forge.com/1.0.3"
+  private val apiRoot = config.apiRoot
   private val quotesPath = "/quotes"
 
   override def get(pair: Pair): F[Rate] = ???
 
-  override def getAllPairs: F[Set[Rate]] =
+  override def getAllRates: F[Set[Rate]] =
     for {
       rootUri ← S.fromEither[Uri](Uri.fromString(apiRoot))
       uri = rootUri

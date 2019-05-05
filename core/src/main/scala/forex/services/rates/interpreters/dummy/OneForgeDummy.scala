@@ -11,5 +11,5 @@ class OneForgeDummy[F[_]](implicit A: Applicative[F]) extends Algebra[F] {
       Rate(pair, Price(BigDecimal(100)), Timestamp.now)
     )
 
-  override def getAllPairs = ???
+  override def getAllRates = ???
 }

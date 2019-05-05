@@ -4,5 +4,5 @@ import forex.domain.{ Pair, Rate }
 
 trait Algebra[F[_]] {
   def get(pair: Pair): F[Rate]
-  def getAllPairs: F[Set[Rate]]
+  def getAllRates: F[Set[Rate]]
 }
