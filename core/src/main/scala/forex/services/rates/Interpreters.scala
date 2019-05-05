@@ -11,6 +11,7 @@ object Interpreters {
 
   def dummy[F[_]](implicit A: Applicative[F]): Algebra[F] =
     new OneForgeDummy[F]()
+
   def live[F[_]](
     config: OneForgeConfig,
     httpClient: Client[F]

@@ -5,6 +5,7 @@ import scala.concurrent.ExecutionContext
 import cats.effect._
 import cats.syntax.functor._
 import forex.config._
+import forex.repositories.RatesRepository
 import fs2.Stream
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -31,7 +32,8 @@ class Application[F[_]](
       httpClient <- BlazeClientBuilder
         .apply(EC)
         .stream
-      module = new Module[F](config, httpClient)
+      ratesRepository <- Stream.eval(RatesRepository.getCache)
+      module = new Module[F](config, httpClient, ratesRepository)
       _ <- BlazeServerBuilder[F]
         .bindHttp(config.http.port, config.http.host)
         .withHttpApp(module.httpApp)

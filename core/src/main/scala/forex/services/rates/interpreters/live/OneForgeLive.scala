@@ -26,8 +26,6 @@ class OneForgeLive[F[_]](
   private val apiRoot = config.apiRoot
   private val quotesPath = "/quotes"
 
-  override def get(pair: Pair): F[Rate] = ???
-
   override def getAllRates: F[Set[Rate]] =
     for {
       rootUri <- S.fromEither[Uri](Uri.fromString(apiRoot))

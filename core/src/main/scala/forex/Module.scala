@@ -4,6 +4,7 @@ import cats.effect.{ Concurrent, Timer }
 import forex.config.ApplicationConfig
 import forex.http.rates.RatesHttpRoutes
 import forex.programs._
+import forex.repositories.RatesRepository
 import forex.services._
 import org.http4s._
 import org.http4s.client.Client
@@ -12,7 +13,8 @@ import org.http4s.server.middleware.{ AutoSlash, Timeout }
 
 class Module[F[_]](
   config: ApplicationConfig,
-  httpClient: Client[F]
+  httpClient: Client[F],
+  ratesRepository: RatesRepository[F]
 )(
   implicit
   C: Concurrent[F],
@@ -21,7 +23,7 @@ class Module[F[_]](
 
   private val ratesService: RatesService[F] = RatesServices.live[F](config.oneForge, httpClient)
 
-  private val ratesProgram: RatesProgram[F] = RatesProgram[F](ratesService)
+  private val ratesProgram: RatesProgram[F] = RatesProgram[F](ratesService, ratesRepository)
 
   private val ratesHttpRoutes: HttpRoutes[F] = new RatesHttpRoutes[F](ratesProgram).routes
 
