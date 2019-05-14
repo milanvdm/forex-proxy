@@ -67,7 +67,7 @@ lazy val D = new {
     val fs2 = "1.0.4"
     val http4s = "0.20.0"
     val circe = "0.11.1"
-    val pureConfig = "0.10.2"
+    val pureConfig = "0.11.0"
 
     // Test
     val scalaCheck = "1.14.0"

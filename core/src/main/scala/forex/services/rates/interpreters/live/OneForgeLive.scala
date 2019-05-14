@@ -6,10 +6,10 @@ import forex.config.OneForgeConfig
 import forex.domain.{ Pair, Rate }
 import forex.services.rates.{ Algebra, Error }
 import io.circe.generic.auto._
+import org.http4s.DecodeFailure
 import org.http4s.Status.Successful
 import org.http4s.circe.CirceEntityDecoder._
 import org.http4s.client.Client
-import org.http4s.{ DecodeFailure, Uri }
 
 class OneForgeLive[F[_]](
   config: OneForgeConfig,
@@ -23,18 +23,16 @@ class OneForgeLive[F[_]](
   import Protocol._
   import QueryParams._
 
-  private val apiRoot = config.apiRoot
   private val quotesPath = "/quotes"
 
-  override def getAllRates: F[Set[Rate]] =
-    for {
-      rootUri <- S.fromEither[Uri](Uri.fromString(apiRoot))
-      uri = rootUri
-        .withPath(quotesPath)
-        .withQueryParam("pairs", Pair.all)
-        .withQueryParam("api_key", config.apiKey)
+  override def getAllRates: F[Set[Rate]] = {
+    val uri = config.apiRoot
+      .withPath(quotesPath)
+      .withQueryParam("pairs", Pair.all)
+      .withQueryParam("api_key", config.apiKey)
 
-      pairs <- httpClient.get[Set[OneForgeSuccessResponse]](uri) {
+    for {
+      pairs <- httpClient.get[Set[OneForgeSuccessResponse]](uri) { //TODO: fetch
         case Successful(response) =>
           response
             .as[Set[OneForgeSuccessResponse]]
@@ -57,5 +55,6 @@ class OneForgeLive[F[_]](
           )
       }
     } yield pairs.map(toRate)
+  }
 
 }

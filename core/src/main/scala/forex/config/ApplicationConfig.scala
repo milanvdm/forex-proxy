@@ -2,9 +2,12 @@ package forex.config
 
 import scala.concurrent.duration.FiniteDuration
 
+import org.http4s.Uri
+
 case class ApplicationConfig(
   http: HttpConfig,
-  oneForge: OneForgeConfig
+  oneForge: OneForgeConfig,
+  cache: CacheConfig
 )
 
 case class HttpConfig(
@@ -14,6 +17,8 @@ case class HttpConfig(
 )
 
 case class OneForgeConfig(
-  apiRoot: String,
+  apiRoot: Uri,
   apiKey: String
 )
+
+case class CacheConfig(timeToLive: FiniteDuration)

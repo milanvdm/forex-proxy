@@ -11,7 +11,7 @@ import org.http4s.circe._
 import org.http4s.client.Client
 import org.http4s.dsl.Http4sDsl
 import org.http4s.implicits._
-import org.http4s.{ HttpRoutes, Response }
+import org.http4s.{ HttpRoutes, Response, Uri }
 import org.scalatest.{ FlatSpec, Matchers }
 
 class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
@@ -99,7 +99,7 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
 
 object OneForgeLiveSpec {
 
-  val config = OneForgeConfig("http://myservice", "secret")
+  val config = OneForgeConfig(Uri.unsafeFromString("http://myservice"), "secret")
 
   val successResponse: Json =
     json"""
