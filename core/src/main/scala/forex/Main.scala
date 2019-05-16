@@ -32,7 +32,7 @@ class Application[F[_]](
       httpClient <- BlazeClientBuilder
         .apply(EC)
         .stream
-      ratesRepository <- Stream.eval(RatesRepository.getCache)
+      ratesRepository <- Stream.eval(RatesRepository.getCache(config.cache))
       module = new Module[F](config, httpClient, ratesRepository)
       _ <- BlazeServerBuilder[F]
         .bindHttp(config.http.port, config.http.host)

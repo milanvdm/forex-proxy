@@ -1,8 +1,22 @@
 package forex.domain
 
-import java.time.{ Instant, OffsetDateTime, ZoneId }
+import java.time.{ Instant, OffsetDateTime, ZoneOffset }
 
-case class Timestamp(value: OffsetDateTime) extends AnyVal
+import scala.concurrent.duration.FiniteDuration
+
+case class Timestamp(value: OffsetDateTime) extends AnyVal {
+
+  def isBefore(other: Timestamp): Boolean = value.isBefore(other.value)
+
+  def plus(duration: FiniteDuration): Timestamp = Timestamp(
+    value.plusNanos(duration.toNanos)
+  )
+
+  def minus(duration: FiniteDuration): Timestamp = Timestamp(
+    value.minusNanos(duration.toNanos)
+  )
+
+}
 
 object Timestamp {
   def now: Timestamp =
@@ -12,7 +26,7 @@ object Timestamp {
     Timestamp(
       Instant
         .ofEpochSecond(epoch)
-        .atZone(ZoneId.systemDefault)
+        .atZone(ZoneOffset.UTC)
         .toOffsetDateTime
     )
 }

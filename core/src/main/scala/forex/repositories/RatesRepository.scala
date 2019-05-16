@@ -1,36 +1,82 @@
 package forex.repositories
 
-import cats.effect.Sync
-import cats.effect.concurrent.Ref
+import scala.concurrent.duration.SECONDS
+
+import cats.effect.concurrent.{ Ref, Semaphore }
+import cats.effect.{ Clock, Concurrent, Sync }
+import cats.syntax.flatMap._
 import cats.syntax.functor._
-import forex.domain.{ Pair, Rate }
+import forex.config.CacheConfig
+import forex.domain.{ Pair, Rate, Timestamp }
 
 object RatesRepository {
 
-  def getCache[F[_]](implicit S: Sync[F]): F[RatesRepository[F]] =
-    Ref
-      .of[F, Map[Pair, Rate]](Map.empty)
-      .map { cache =>
-        new RatesCache[F](cache)
-      }
+  def getCache[F[_], G[_]](
+    config: CacheConfig
+  )(
+    implicit
+    S: Sync[F],
+    Co: Concurrent[G],
+    Cl: Clock[G]
+  ): F[RatesRepository[G]] =
+    for {
+      semaphore <- Semaphore.in[F, G](1)
+      cache <- Ref.in[F, G, Map[Pair, Rate]](Map.empty)
+    } yield
+      new RatesCache[F, G](
+        config,
+        semaphore,
+        cache
+      )
 }
 
-trait RatesRepository[F[_]] {
+trait RatesRepository[G[_]] {
 
-  def get(pair: Pair): F[Rate]
-  def update(rates: Set[Rate]): F[Unit]
+  def getOrUpdate(
+    pair: Pair,
+    update: () => G[Map[Pair, Rate]]
+  ): G[Option[Rate]]
 
 }
 
-class RatesCache[F[_]](
-  cache: Ref[F, Map[Pair, Rate]]
+class RatesCache[F[_], G[_]](
+  config: CacheConfig,
+  semaphore: Semaphore[G],
+  cache: Ref[G, Map[Pair, Rate]]
 )(
   implicit
-  S: Sync[F]
-) extends RatesRepository[F] {
+  Co: Concurrent[G],
+  Cl: Clock[G]
+) extends RatesRepository[G] {
 
-  override def get(pair: Pair): F[Rate] = ???
+  override def getOrUpdate(
+    pair: Pair,
+    update: () => G[Map[Pair, Rate]]
+  ): G[Option[Rate]] =
+    get(pair).flatMap(onExpired(_) {
+      semaphore.withPermit {
+        get(pair).flatMap(onExpired(_) {
+          updateCache(update)(pair)
+        })
+      }
+    })
 
-  override def update(rates: Set[Rate]): F[Unit] = ???
+  private def get(pair: Pair): G[Option[Rate]] = cache.get.map(_.get(pair))
+
+  private def onExpired(rate: Option[Rate])(onExpired: G[Option[Rate]]): G[Option[Rate]] = {
+    val expired = Cl.realTime(SECONDS).map { currentTime =>
+      val now = Timestamp.fromEpoch(currentTime)
+      rate.forall(_.timestamp.isBefore(now.minus(config.timeToLive)))
+    }
+    expired.flatMap { e =>
+      if (e) onExpired else Co.pure(rate)
+    }
+  }
+
+  private def updateCache(update: () => G[Map[Pair, Rate]])(pair: Pair): G[Option[Rate]] =
+    for {
+      rates <- update()
+      _ <- cache.set(rates)
+    } yield rates.get(pair)
 
 }
