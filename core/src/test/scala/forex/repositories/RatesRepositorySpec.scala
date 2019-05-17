@@ -31,7 +31,7 @@ class RatesRepositorySpec extends FlatSpec with Matchers {
     counter.get.unsafeRunSync shouldBe 1
   }
 
-  "getOrUpdate" should "correctly return non-expired value without calling update" in {
+  it should "correctly return non-expired value without calling update" in {
     implicit val clock: Clock[IO] =
       createTestClock[IO](() => IO.delay(lastUpdate.plus(ttl - 1.minute).value.toEpochSecond))
 
@@ -48,7 +48,7 @@ class RatesRepositorySpec extends FlatSpec with Matchers {
     counter.get.unsafeRunSync shouldBe 1
   }
 
-  "getOrUpdate" should "correctly call update on expired value" in {
+  it should "correctly call update on expired value" in {
     implicit val clock: Clock[IO] =
       createTestClock[IO](() => IO.delay(lastUpdate.plus(ttl + 1.minute).value.toEpochSecond))
 
@@ -65,7 +65,7 @@ class RatesRepositorySpec extends FlatSpec with Matchers {
     counter.get.unsafeRunSync shouldBe 2
   }
 
-  "getOrUpdate" should "only call update once with concurrent requests" in {
+  it should "only call update once with concurrent requests" in {
     implicit val clock: Clock[IO] =
       createTestClock[IO](() => IO.delay(lastUpdate.plus(ttl + 1.minute).value.toEpochSecond))
 

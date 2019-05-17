@@ -32,7 +32,7 @@ class OneForgeLive[F[_]](
       .withQueryParam("api_key", config.apiKey)
 
     for {
-      pairs <- httpClient.get[Set[OneForgeSuccessResponse]](uri) { //TODO: fetch
+      pairs <- httpClient.get[Set[OneForgeSuccessResponse]](uri) {
         case Successful(response) =>
           response
             .as[Set[OneForgeSuccessResponse]]
@@ -46,7 +46,7 @@ class OneForgeLive[F[_]](
                   }
                   .map(_ => Set.empty[OneForgeSuccessResponse])
                   .adaptError {
-                    case _: DecodeFailure => Error.Internal("Failed to decode api response")
+                    case _: DecodeFailure => Error.Internal("Failed to decode OneForge api response")
                   }
             }
         case response =>

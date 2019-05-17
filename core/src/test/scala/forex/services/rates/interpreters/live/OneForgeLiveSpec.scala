@@ -56,7 +56,7 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
 
   }
 
-  "getAllRates" should "return Error if Forge API responds with error message" in {
+  it should "return Error if Forge API responds with error message" in {
 
     val httpClient = mockHttpClient(Ok(errorResponse))
     val ratesService = RatesServices.live[IO](config, httpClient)
@@ -69,7 +69,7 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
 
   }
 
-  "getAllRates" should "return Error if Forge API responds with random message" in {
+  it should "return Error if Forge API responds with random message" in {
 
     val httpClient = mockHttpClient(Ok("random"))
     val ratesService = RatesServices.live[IO](config, httpClient)
@@ -78,11 +78,11 @@ class OneForgeLiveSpec extends FlatSpec with Matchers with Http4sDsl[IO] {
       ratesService.getAllRates.unsafeRunSync()
     }
 
-    exception.reason shouldBe "Failed to decode api response"
+    exception.reason shouldBe "Failed to decode OneForge api response"
 
   }
 
-  "getAllRates" should "return Error if Forge API responds with 404" in {
+  it should "return Error if Forge API responds with 404" in {
 
     val httpClient = mockHttpClient(NotFound())
     val ratesService = RatesServices.live[IO](config, httpClient)
