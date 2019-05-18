@@ -1,7 +1,10 @@
 package forex.programs.rates
 
 import cats.effect.Sync
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import cats.syntax.monadError._
+import cats.syntax.option._
 import forex.domain._
 import forex.programs.rates.errors._
 import forex.repositories.RatesRepository
@@ -13,12 +16,16 @@ class Program[F[_]](
   ratesRepository: RatesRepository[F]
 )(
   implicit
-  A: Sync[F]
+  S: Sync[F]
 ) extends Algebra[F] {
 
   override def get(request: Protocol.GetRatesRequest): F[Rate] =
     ratesRepository
-      .get(Pair(request.from, request.to))
+      .getOrUpdate(
+        Pair(request.from, request.to),
+        () => ratesService.getAllRates.map(_.map(rate => rate.pair -> rate).toMap)
+      )
+      .flatMap(_.liftTo[F](Error.RateNotFound))
       .adaptError {
         case error: RatesServiceError => toProgramError(error)
       }

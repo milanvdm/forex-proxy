@@ -12,10 +12,12 @@ object errors {
       msg: String,
       status: Int
     ) extends Error
+    final case object RateNotFound extends Error
   }
 
   def toApiError(error: RatesProgramError): Error = error match {
     case RatesProgramError.Internal(reason) => Error.Internal(reason)
     case RatesProgramError.RateLookupFailed(msg, status) => Error.RateLookupFailed(msg, status)
+    case RatesProgramError.RateNotFound => Error.RateNotFound
   }
 }

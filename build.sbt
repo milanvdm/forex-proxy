@@ -62,11 +62,12 @@ lazy val D = new {
     val cats = "1.6.0"
     val catsEffect = "1.3.0"
     val catsPar = "0.2.1"
+    val circe = "0.11.1"
     val enumeratum = "1.5.13"
     val enumeratumCirce = "1.5.21"
     val fs2 = "1.0.4"
-    val http4s = "0.20.0"
-    val circe = "0.11.1"
+    val http4s = "0.20.1"
+    val logback = "1.2.3"
     val pureConfig = "0.11.0"
 
     // Test
@@ -95,6 +96,7 @@ lazy val D = new {
   val http4sCirce = "org.http4s"           %% "http4s-circe"         % Versions.http4s
   val http4sClient = "org.http4s"          %% "http4s-blaze-client"  % Versions.http4s
   val http4sDsl = "org.http4s"             %% "http4s-dsl"           % Versions.http4s
+  val logback = "ch.qos.logback"           % "logback-classic"       % Versions.logback
   val pureConfig = "com.github.pureconfig" %% "pureconfig"           % Versions.pureConfig
 
   // Test
@@ -141,6 +143,7 @@ lazy val core = Project(
       D.http4sCirce,
       D.http4sClient,
       D.http4sDsl,
+      D.logback,
       D.pureConfig,
       D.scalaTest % "test"
     )

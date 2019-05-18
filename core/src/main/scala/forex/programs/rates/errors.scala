@@ -11,6 +11,7 @@ object errors {
       msg: String,
       status: Int
     ) extends Error
+    final object RateNotFound extends Error
   }
 
   def toProgramError(error: RatesServiceError): Error = error match {
